@@ -68,7 +68,8 @@ export default function Board() {
         colors.flatMap((colorCol, x) => {
           return colorCol.map((color, y) => 
           {
-            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize} select={() => selectTile([x,y], color)} swap={() => swapTiles([x,y], color)}/>
+            const isCorner = (x === 0 || x === cols -1) && (y === 0 || y === rows -1)
+            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize} select={() => selectTile([x,y], color)} swap={() => swapTiles([x,y], color)} isCorner={isCorner}/>
           })
         })
       }

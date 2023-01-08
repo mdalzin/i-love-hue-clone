@@ -2,14 +2,16 @@ import { CSSProperties, useRef, useState } from "react";
 import styled from "styled-components";
 import useDocumentEvent from "../hooks/useDocumentEvent";
 import { color, Event } from "../types";
+import DisabledDot from "./DisabledDot";
 
 const Container = styled.div`
   position: absolute;
 `
 
-const clickedSizeIncrease = .3;
+const dragSizeIncrease = .3;
 
-export default function Tile({color, size, position, select, swap}: {color: color, size: number[], position: number[], select: () => void, swap: () => void}) {
+export default function Tile({color, size, position, select, swap, isCorner = false}:
+  {color: color, size: number[], position: number[], select: () => void, swap: () => void, isCorner: boolean}) {
 
   const [isDragging, setIsDragging] = useState(false);
   const [dx, setDx] = useState<number>(0);
@@ -19,6 +21,8 @@ export default function Tile({color, size, position, select, swap}: {color: colo
 
   function onMouseDown(e: React.MouseEvent) {
     e.preventDefault();
+    if (isCorner) return;
+
     select();
     setIsDragging(true);
     dragStartPosition.current = [e.screenX, e.screenY];
@@ -41,25 +45,30 @@ export default function Tile({color, size, position, select, swap}: {color: colo
   })
 
   const divRef = useRef<HTMLDivElement>(null);
-  const clickedMultiplier = 1 + clickedSizeIncrease;
 
   const style: CSSProperties = {
     zIndex: isDragging ? 10 : 0,
     background: `rgb(${color.r},${color.g},${color.b})`,
-    width: isDragging ? clickedMultiplier* size[0] : size[0],
-    height: isDragging ? clickedMultiplier * size[1] : size[1],
+    width: size[0],
+    height: size[1],
     left: (position[0] * size[0]) + dx,
     top: (position[1] * size[1]) + dy,
     pointerEvents: isDragging ? 'none' : 'auto'
   }
 
   if (isDragging) {
-    const resizeTranslation = (-50 * clickedSizeIncrease) / clickedMultiplier;
+    const dragMultiplier = 1 + dragSizeIncrease;
+
+    (style.height as number) *= dragMultiplier;
+    (style.width as number) *= dragMultiplier;
+
+    const resizeTranslation = (-50 * dragSizeIncrease) / dragMultiplier;
     style.transform = `translate(${resizeTranslation}%,${resizeTranslation}%)`
   }
 
   return (
     <Container ref={divRef} onMouseDown={onMouseDown} onMouseUp={swap} style={style}>
+      {isCorner && <DisabledDot/>}
     </Container>
   );
 }
