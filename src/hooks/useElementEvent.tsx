@@ -6,7 +6,6 @@ export default function useElementEvent(element: React.RefObject<HTMLDivElement>
 
   function assignListener() {
     if (element.current) {
-      console.log('ahh');
       element.current.addEventListener(event, callback);
     }
   }

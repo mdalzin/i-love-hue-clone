@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import styled, { CSSProperties } from "styled-components";
-import useElementEvent from "../hooks/useElementEvent";
-import useDocumentEvent from "../hooks/useDocumentEvent";
+import styled from "styled-components";
 import { color, Event } from "../types";
-import Cursor from "./Cursor";
 import Tile from "./Tile";
 import useWindowEvent from "../hooks/useWindowEvent";
 
@@ -83,20 +80,18 @@ export default function Board() {
 
   useEffect(() => {
     colorsRef.current = getBoardColors(rows, cols);
+    updateTileSize();
   }, [])
 
   const [tileSize, setTileSize] = useState([0, 0]);
 
-  useWindowEvent(Event.Resize, () => {
+  useWindowEvent(Event.Resize, updateTileSize);
+
+  function updateTileSize() {
     if (boardRef.current) {
       setTileSize([boardRef.current.offsetWidth / cols, boardRef.current.offsetHeight / rows]);
     }
-  });
-
-  // const style: CSSProperties = {
-  //   gridTemplateRows: `repeat(${rows}, 1fr)`,
-  //   gridTemplateColumns: `repeat(${cols}, 1fr)`
-  // };
+  }
 
   return (
     <Container ref={boardRef}>
