@@ -61,7 +61,7 @@ function interpolateColors(startColor: color, endColor: color, numColors: number
 
 function getBoardColors(rows: number, cols: number): color[][] {
 
-  const [topLeft, topRight, bottomLeft, bottomRight] = Array(4).map(() => getRandomColor());
+  const [topLeft, topRight, bottomLeft, bottomRight] = Array.from({length: 4}, getRandomColor);
 
   if (rows === 1 && cols === 1) return [[topLeft]];
 
