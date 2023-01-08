@@ -8,14 +8,14 @@ const Container = styled.div`
   position: absolute;
   width: 80%;
   height: 80%;
-  background: lightcoral;
+  background: black;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
 `
 
 const rows = 10;
-const cols = 10;
+const cols = 8;
 
 function getRandomColor(): color {
   
@@ -62,30 +62,50 @@ function getBoardColors(rows: number, cols: number): color[][] {
 
   const [topLeft, topRight, bottomLeft, bottomRight] = Array.from({length: 4}, getRandomColor);
 
-  if (rows === 1 && cols === 1) return [[topLeft]];
+  if (cols === 1 && rows === 1) return [[topLeft]];
 
-  if (rows === 1) return [interpolateColors(topLeft, topRight, cols)]
+  if (cols === 1) return [interpolateColors(topLeft, bottomLeft, rows)]
 
-  if (cols === 1) return interpolateColors(topLeft, bottomLeft, rows).map(color => [color]);
+  if (rows === 1) return interpolateColors(topLeft, bottomLeft, cols).map(color => [color]);
 
-  const leftCol = interpolateColors(topLeft, bottomLeft, rows);
-  const rightCol = interpolateColors(topRight, bottomRight, rows);
-  return leftCol.map((leftColor, i) => interpolateColors(leftColor, rightCol[i], cols));
+  const topRow = interpolateColors(topLeft, topRight, cols);
+  const bottomRow = interpolateColors(bottomLeft, bottomRight, cols);
+  return topRow.map((topColor, i) => interpolateColors(topColor, bottomRow[i], rows));
 }
 
 export default function Board() {
 
-  const boardRef = useRef<HTMLDivElement>(null)
-  const colorsRef = useRef<color[][]>([[]]);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const selectedPosition = useRef<[number, number] | null>(null);
+  const selectedColor = useRef<color | null>(null);
+
+  const [colors, setColors] = useState(getBoardColors(rows, cols));
 
   useEffect(() => {
-    colorsRef.current = getBoardColors(rows, cols);
     updateTileSize();
   }, [])
 
   const [tileSize, setTileSize] = useState([0, 0]);
 
   useWindowEvent(Event.Resize, updateTileSize);
+
+  function setSelectedTile(position: [number, number] | null, color: color | null) {
+    selectedPosition.current = position;
+    selectedColor.current = color;
+  }
+
+  function swapTiles(endPosition: [number, number], endColor: color) {
+    setColors(prevColors => {
+      const newColors = [...prevColors];
+
+      if (selectedPosition.current && selectedColor.current) {
+        newColors[selectedPosition.current[0]][selectedPosition.current[1]] = endColor;
+        newColors[endPosition[0]][endPosition[1]] = selectedColor.current;
+      }
+
+      return newColors;
+    })
+  }
 
   function updateTileSize() {
     if (boardRef.current) {
@@ -96,10 +116,10 @@ export default function Board() {
   return (
     <Container ref={boardRef}>
       {
-        colorsRef.current.flatMap((colorRow, y) => {
-          return colorRow.map((color, x) => 
+        colors.flatMap((colorCol, x) => {
+          return colorCol.map((color, y) => 
           {
-            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize}/>
+            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize} select={() => setSelectedTile([x,y], color)} swap={() => swapTiles([x,y], color)}/>
           })
         })
       }

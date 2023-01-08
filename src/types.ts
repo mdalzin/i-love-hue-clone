@@ -8,5 +8,6 @@ export enum Event {
   MouseDown = 'mousedown',
   MouseUp = 'mouseup',
   Click = 'click',
-  Resize = 'resize'
+  Resize = 'resize',
+  MouseMove = 'mousemove'
 }
