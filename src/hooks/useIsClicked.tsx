@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Event } from '../types';
 import useElementEvent from './useElementEvent';
-import useEvent from './useEvent';
+import useDocumentEvent from './useDocumentEvent';
 
 export function useIsClicked(element: any) {
 
   const [isClicked, setIsClicked] = useState(false);
 
   useElementEvent(element, Event.MouseDown, () => setIsClicked(true));
-  useEvent(Event.MouseUp, () => setIsClicked(false));
+  useDocumentEvent(Event.MouseUp, () => setIsClicked(false));
 
   return isClicked;
 }

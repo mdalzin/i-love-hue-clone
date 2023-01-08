@@ -1,7 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import styled, { CSSProperties } from "styled-components";
-import { color } from "../types";
+import useElementEvent from "../hooks/useElementEvent";
+import useDocumentEvent from "../hooks/useDocumentEvent";
+import { color, Event } from "../types";
 import Cursor from "./Cursor";
 import Tile from "./Tile";
+import useWindowEvent from "../hooks/useWindowEvent";
 
 const Container = styled.div`
   position: absolute;
@@ -11,9 +15,6 @@ const Container = styled.div`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  grid-template-rows: repeat(3, 1fr);
 `
 
 const rows = 10;
@@ -77,20 +78,35 @@ function getBoardColors(rows: number, cols: number): color[][] {
 
 export default function Board() {
 
-  const colors = getBoardColors(rows, cols);
+  const boardRef = useRef<HTMLDivElement>(null)
+  const colorsRef = useRef<color[][]>([[]]);
 
-  const style: CSSProperties = {
-    gridTemplateRows: `repeat(${rows}, 1fr)`,
-    gridTemplateColumns: `repeat(${cols}, 1fr)`
-  };
+  useEffect(() => {
+    colorsRef.current = getBoardColors(rows, cols);
+  }, [])
 
-  const colorArray = colors.flat();
+  const [tileSize, setTileSize] = useState([0, 0]);
+
+  useWindowEvent(Event.Resize, () => {
+    if (boardRef.current) {
+      setTileSize([boardRef.current.offsetWidth / cols, boardRef.current.offsetHeight / rows]);
+    }
+  });
+
+  // const style: CSSProperties = {
+  //   gridTemplateRows: `repeat(${rows}, 1fr)`,
+  //   gridTemplateColumns: `repeat(${cols}, 1fr)`
+  // };
 
   return (
-    <Container style={style}>
-      <Cursor isActive={false} color={{r: 0, g: 0, b: 0}} tileDimensions={[]}/>
+    <Container ref={boardRef}>
       {
-        colorArray.map((color, i) => <Tile key={i} color={color}/>)
+        colorsRef.current.flatMap((colorRow, y) => {
+          return colorRow.map((color, x) => 
+          {
+            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize}/>
+          })
+        })
       }
     </Container>
   );

@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 import { Event } from '../types';
 
 
-export default function useElementEvent(element: React.RefObject<HTMLDivElement>, event: Event, callback: () => any) {
+export default function useElementEvent(element: React.RefObject<HTMLDivElement>, event: Event, callback: (ev: MouseEvent | UIEvent) => any) {
 
   function assignListener() {
     if (element.current) {
+      console.log('ahh');
       element.current.addEventListener(event, callback);
     }
   }
