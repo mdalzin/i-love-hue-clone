@@ -1,5 +1,6 @@
 import styled, { CSSProperties } from "styled-components";
 import { color } from "../types";
+import Cursor from "./Cursor";
 import Tile from "./Tile";
 
 const Container = styled.div`
@@ -83,10 +84,13 @@ export default function Board() {
     gridTemplateColumns: `repeat(${cols}, 1fr)`
   };
 
+  const colorArray = colors.flat();
+
   return (
     <Container style={style}>
+      <Cursor isActive={false} color={{r: 0, g: 0, b: 0}} tileDimensions={[]}/>
       {
-        colors.flat().map((color, i) => <Tile key={i} color={color}/>)
+        colorArray.map((color, i) => <Tile key={i} color={color}/>)
       }
     </Container>
   );
