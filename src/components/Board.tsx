@@ -5,6 +5,7 @@ import Tile from "./Tile";
 import useWindowEvent from "../hooks/useWindowEvent";
 import useDocumentEvent from "../hooks/useDocumentEvent";
 import { boardsAreEqual, getBoardColors, shuffleColors } from "../helpers/colorHelpers";
+import WinOverlay from "./WinOverlay";
 
 const Container = styled.div`
   position: relative;
@@ -18,6 +19,7 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
 
   const [colors, setColors] = useState(shuffleColors(solutionBoard.current));
   const [tileSize, setTileSize] = useState([0, 0]);
+  const [isWon, setIsWon] = useState(false);
 
   const boardRef = useRef<HTMLDivElement>(null);
   const selectedPosition = useRef<[number, number] | null>(null);
@@ -33,10 +35,13 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
     solutionBoard.current = getBoardColors(rows, cols);
     setColors(shuffleColors(solutionBoard.current));
     updateTileSize();
+    setIsWon(false);
   }, [gameIndex, rows, cols])
 
   useEffect(() => {
-    if (boardsAreEqual(solutionBoard.current, colors)) alert('You Win!');
+    if (boardsAreEqual(solutionBoard.current, colors)) {
+      setIsWon(true);
+    };
   }, [colors])
 
   function updateTileSize() {
@@ -72,6 +77,7 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
           })
         })
       }
+      {isWon && <WinOverlay/>}
     </Container>
   );
 }
