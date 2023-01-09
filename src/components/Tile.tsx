@@ -67,7 +67,7 @@ export default function Tile({color, size, position, select, swap, isCorner = fa
   }
 
   return (
-    <Container ref={divRef} onMouseDown={onMouseDown} onMouseUp={swap} style={style}>
+    <Container ref={divRef} onMouseDown={onMouseDown} onMouseUp={() => {!isCorner && swap()}} style={style}>
       {isCorner && <DisabledDot/>}
     </Container>
   );
