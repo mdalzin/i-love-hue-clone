@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import Board from './components/Board';
-import NewBoardBar from './components/NewBoardBar';
+import NewGameBar from './components/NewGameBar';
 
 const Container = styled.div`
   position: absolute;
@@ -14,10 +15,19 @@ const Container = styled.div`
 `
 
 function App() {
+
+  const [gameIndex, setGameIndex] = useState(0);
+  const [[rows, cols], setDimensions] = useState([8, 10]);
+
+  function newGame(rows: number, cols: number) {
+    setGameIndex(prev => prev + 1);
+    setDimensions([rows, cols]);
+  }
+
   return (
     <Container>
-      <NewBoardBar/>
-      <Board/>
+      <NewGameBar newGame={newGame}/>
+      <Board gameIndex={gameIndex} rows={rows} cols={cols}/>
     </Container>
   );
 }

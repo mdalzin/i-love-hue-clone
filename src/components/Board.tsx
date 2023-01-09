@@ -12,10 +12,7 @@ const Container = styled.div`
   background: black;
 `
 
-const rows = 4;
-const cols = 4;
-
-export default function Board() {
+export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows: number, cols: number}) {
 
   const solutionBoard = useRef(getBoardColors(rows, cols));
 
@@ -33,8 +30,10 @@ export default function Board() {
   })
 
   useEffect(() => {
+    solutionBoard.current = getBoardColors(rows, cols);
+    setColors(shuffleColors(solutionBoard.current));
     updateTileSize();
-  }, [])
+  }, [gameIndex, rows, cols])
 
   useEffect(() => {
     if (boardsAreEqual(solutionBoard.current, colors)) alert('You Win!');
