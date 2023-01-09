@@ -7,13 +7,9 @@ import useDocumentEvent from "../hooks/useDocumentEvent";
 import { boardsAreEqual, getBoardColors, shuffleColors } from "../helpers/colorHelpers";
 
 const Container = styled.div`
-  position: absolute;
-  width: 80%;
-  height: 80%;
+  position: relative;
+  flex-grow: 1;
   background: black;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
 `
 
 const rows = 4;
