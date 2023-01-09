@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { color, Event } from "../types";
 import Tile from "./Tile";
@@ -18,12 +18,18 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
   const solutionBoard = useRef(getBoardColors(rows, cols));
 
   const [colors, setColors] = useState(shuffleColors(solutionBoard.current));
-  const [tileSize, setTileSize] = useState([0, 0]);
+  const [tileSize, setTileSize] = useState<[number,number]>([0, 0]);
   const [isWon, setIsWon] = useState(false);
 
   const boardRef = useRef<HTMLDivElement>(null);
   const selectedPosition = useRef<[number, number] | null>(null);
   const selectedColor = useRef<color | null>(null);
+
+  const updateTileSize = useCallback(() => {
+    if (boardRef.current) {
+      setTileSize([boardRef.current.offsetWidth / cols, boardRef.current.offsetHeight / rows]);
+    }
+  }, [rows, cols]);
 
   useWindowEvent(Event.Resize, updateTileSize);
   useDocumentEvent(Event.MouseUp, () => {
@@ -36,19 +42,11 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
     setColors(shuffleColors(solutionBoard.current));
     updateTileSize();
     setIsWon(false);
-  }, [gameIndex, rows, cols])
+  }, [gameIndex, rows, cols, updateTileSize])
 
   useEffect(() => {
-    if (boardsAreEqual(solutionBoard.current, colors)) {
-      setIsWon(true);
-    };
+    if (boardsAreEqual(solutionBoard.current, colors)) setIsWon(true);
   }, [colors])
-
-  function updateTileSize() {
-    if (boardRef.current) {
-      setTileSize([boardRef.current.offsetWidth / cols, boardRef.current.offsetHeight / rows]);
-    }
-  }
 
   function selectTile(position: [number, number] | null, color: color | null) {
     selectedPosition.current = position;
@@ -73,7 +71,8 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
           return colorCol.map((color, y) => 
           {
             const isCorner = (x === 0 || x === cols -1) && (y === 0 || y === rows -1);
-            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize} select={() => selectTile([x,y], color)} swap={() => swapTiles([x,y], color)} isCorner={isCorner}/>
+            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize}
+              select={() => selectTile([x,y], color)} swap={() => swapTiles([x,y], color)} isCorner={isCorner}/>
           })
         })
       }

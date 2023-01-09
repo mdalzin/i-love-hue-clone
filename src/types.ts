@@ -5,9 +5,7 @@ export type color = {
 }
 
 export enum Event {
-  MouseDown = 'mousedown',
   MouseUp = 'mouseup',
-  Click = 'click',
-  Resize = 'resize',
-  MouseMove = 'mousemove'
+  MouseMove = 'mousemove',
+  Resize = 'resize'
 }

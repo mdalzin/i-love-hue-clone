@@ -11,7 +11,7 @@ const Container = styled.div`
 const dragSizeIncrease = .3;
 
 export default function Tile({color, size, position, select, swap, isCorner = false}:
-  {color: color, size: number[], position: number[], select: () => void, swap: () => void, isCorner: boolean}) {
+  {color: color, size: [number, number], position: [number, number], select: () => void, swap: () => void, isCorner: boolean}) {
 
   const [isDragging, setIsDragging] = useState(false);
   const [dx, setDx] = useState<number>(0);

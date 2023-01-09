@@ -46,9 +46,7 @@ export function getBoardColors(rows: number, cols: number): color[][] {
   const [topLeft, topRight, bottomLeft, bottomRight] = Array.from({length: 4}, getRandomColor);
 
   if (cols === 1 && rows === 1) return [[topLeft]];
-
   if (cols === 1) return [interpolateColors(topLeft, bottomLeft, rows)]
-
   if (rows === 1) return interpolateColors(topLeft, bottomLeft, cols).map(color => [color]);
 
   const topRow = interpolateColors(topLeft, topRight, cols);
@@ -63,7 +61,7 @@ export function shuffleColors(colors: color[][]): color[][] {
   const cols = oldColors.length;
   const rows = oldColors[0].length;
 
-  const newColors: (color | undefined)[][] = Array.from({ length:cols }, () => (Array.from({ length:rows }, () => undefined)));
+  const newColors: (color | undefined)[][] = Array(cols).fill(undefined).map(() => Array(rows).fill(undefined));
 
   newColors[0][0] = oldColors[0].shift();
   if (rows > 1) newColors[0][rows - 1] = oldColors[0].pop();
@@ -89,9 +87,7 @@ export function boardsAreEqual(board1: color[][], board2: color[][]): boolean {
   const board2Array = board2.flat();
 
   for (let i = 0; i < board1Array.length; i++) {
-    if (!colorsAreEqual(board1Array[i], board2Array[i])) {
-      return false;
-    }
+    if (!colorsAreEqual(board1Array[i], board2Array[i])) return false;
   }
 
   return true;
