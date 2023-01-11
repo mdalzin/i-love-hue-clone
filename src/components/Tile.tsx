@@ -10,10 +10,9 @@ const Container = styled.div`
 
 const dragSizeIncrease = .3;
 
-export default function Tile({color, size, position, select, swap, isCorner = false}:
-  {color: color, size: [number, number], position: [number, number], select: () => void, swap: () => void, isCorner: boolean}) {
+export default function Tile({color, size, isSelected, position, select, swap, isCorner = false}:
+  {color: color, size: [number, number], position: [number, number], isSelected: boolean, select: () => void, swap: () => void, isCorner: boolean}) {
 
-  const [isDragging, setIsDragging] = useState(false);
   const [dx, setDx] = useState<number>(0);
   const [dy, setDy] = useState<number>(0);
 
@@ -23,13 +22,12 @@ export default function Tile({color, size, position, select, swap, isCorner = fa
     e.preventDefault();
     if (isCorner) return;
 
-    select();
-    setIsDragging(true);
     dragStartPosition.current = [e.screenX, e.screenY];
+    select();
   }
 
   useDocumentEvent(Event.MouseMove, e => {
-    if (isDragging) {
+    if (isSelected) {
       const me = e as MouseEvent;
       setDx(me.screenX - dragStartPosition.current[0]);
       setDy(me.screenY - dragStartPosition.current[1]);
@@ -37,8 +35,7 @@ export default function Tile({color, size, position, select, swap, isCorner = fa
   })
 
   useDocumentEvent(Event.MouseUp, () => {
-    if (isDragging) {
-      setIsDragging(false);
+    if (isSelected) {
       setDx(0);
       setDy(0);
     }
@@ -47,16 +44,16 @@ export default function Tile({color, size, position, select, swap, isCorner = fa
   const divRef = useRef<HTMLDivElement>(null);
 
   const style: CSSProperties = {
-    zIndex: isDragging ? 10 : 0,
+    zIndex: isSelected ? 10 : 0,
     background: `rgb(${color.r},${color.g},${color.b})`,
     width: size[0],
     height: size[1],
     left: (position[0] * size[0]) + dx,
     top: (position[1] * size[1]) + dy,
-    pointerEvents: isDragging ? 'none' : 'auto'
+    pointerEvents: isSelected ? 'none' : 'auto'
   }
 
-  if (isDragging) {
+  if (isSelected) {
     const dragMultiplier = 1 + dragSizeIncrease;
 
     (style.height as number) *= dragMultiplier;

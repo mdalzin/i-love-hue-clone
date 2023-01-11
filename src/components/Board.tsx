@@ -20,9 +20,9 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
   const [colors, setColors] = useState(shuffleColors(solutionBoard.current));
   const [tileSize, setTileSize] = useState<[number,number]>([0, 0]);
   const [isWon, setIsWon] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState<[number, number] | null>(null);
 
   const boardRef = useRef<HTMLDivElement>(null);
-  const selectedPosition = useRef<[number, number] | null>(null);
   const selectedColor = useRef<color | null>(null);
 
   const updateTileSize = useCallback(() => {
@@ -33,7 +33,7 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
 
   useWindowEvent(Event.Resize, updateTileSize);
   useDocumentEvent(Event.MouseUp, () => {
-    selectedPosition.current = null;
+    setSelectedPosition(null);
     selectedColor.current = null;
   })
 
@@ -49,15 +49,15 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
   }, [colors])
 
   function selectTile(position: [number, number] | null, color: color | null) {
-    selectedPosition.current = position;
+    setSelectedPosition(position);
     selectedColor.current = color;
   }
 
   function swapTiles(endPosition: [number, number], endColor: color) {
-    if (selectedPosition.current && selectedColor.current) {
+    if (selectedPosition && selectedColor.current) {
       const newColors = colors.map(col => [...col]);
 
-      newColors[selectedPosition.current[0]][selectedPosition.current[1]] = endColor;
+      newColors[selectedPosition[0]][selectedPosition[1]] = endColor;
       newColors[endPosition[0]][endPosition[1]] = selectedColor.current;
 
       setColors(newColors);
@@ -71,7 +71,9 @@ export default function Board({gameIndex, rows, cols}: {gameIndex: number, rows:
           return colorCol.map((color, y) => 
           {
             const isCorner = (x === 0 || x === cols -1) && (y === 0 || y === rows -1);
-            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize}
+            const isSelected = selectedPosition !== null && selectedPosition[0] === x && selectedPosition[1] === y
+
+            return <Tile key={`${x}${y}`} color={color} position={[x, y]} size={tileSize} isSelected={isSelected}
               select={() => selectTile([x,y], color)} swap={() => swapTiles([x,y], color)} isCorner={isCorner}/>
           })
         })
